@@ -73,9 +73,22 @@ METRICS = joblib.load("models/metrics.pkl")
 X_TEST = joblib.load("models/X_test.pkl")
 Y_TEST = joblib.load("models/y_test.pkl")
 
-PREPROCESSING_SUMMARY = joblib.load(
-    "models/preprocessing_summary.pkl"
-)
+PREPROCESSING_SUMMARY = {
+    "Dataset": "Wisconsin Breast Cancer Diagnostic Dataset",
+    "Total Samples": 569,
+    "Total Features": 30,
+    "Missing Values": 0,
+    "Duplicate Samples": 0,
+    "Train-Test Split": "80:20",
+    "Split Method": "Stratified",
+    "Random State": 42,
+    "Standardization": "StandardScaler",
+    "Class Imbalance Handling": "Balanced Class Weights",
+    "Malignant Samples": 212,
+    "Benign Samples": 357,
+    "Malignant Class Weight": 1.3382,
+    "Benign Class Weight": 0.7982
+}
 
 FEATURE_IMPORTANCE = joblib.load(
     os.path.join(MODEL_DIR, "feature_importance.pkl")

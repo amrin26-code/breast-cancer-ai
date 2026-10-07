@@ -103,7 +103,7 @@ page = st.sidebar.radio(
 # ============================================================
 
 
-if page == "🏠 Home":
+ == "🏠 Home":
 
     st.title("🧬 AI-Based Breast Cancer Diagnostic Support")
 
@@ -271,7 +271,7 @@ if page == "🏠 Home":
         "should not be used for clinical diagnosis or treatment decisions."
     )
     if page == "Data Preprocessing":
-    st.title("🧹 Data Preprocessing")
+     st.title("🧹 Data Preprocessing"))
 
     st.write(
         "The Wisconsin Breast Cancer Diagnostic Dataset was "

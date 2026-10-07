@@ -1,4 +1,5 @@
 
+```python
 import streamlit as st
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, roc_auc_score
@@ -69,9 +70,17 @@ FEATURE_NAMES = joblib.load(
     os.path.join(MODEL_DIR, "feature_names.pkl")
 )
 
-METRICS = joblib.load("models/metrics.pkl")
-X_TEST = joblib.load("models/X_test.pkl")
-Y_TEST = joblib.load("models/y_test.pkl")
+METRICS = joblib.load(
+    os.path.join(MODEL_DIR, "metrics.pkl")
+)
+
+X_TEST = joblib.load(
+    os.path.join(MODEL_DIR, "X_test.pkl")
+)
+
+Y_TEST = joblib.load(
+    os.path.join(MODEL_DIR, "y_test.pkl")
+)
 
 PREPROCESSING_SUMMARY = {
     "Dataset": "Wisconsin Breast Cancer Diagnostic Dataset",
@@ -102,20 +111,19 @@ st.sidebar.title("Navigation")
 
 page = st.sidebar.radio(
     "Go to",
-[
-    "🏠 Home",
-    "🧹 Data Preprocessing",
-    "🔬 Prediction",
-    "📊 Model Performance",
-    "⭐ Feature Importance",
-    "ℹ️ About"
-]
+    [
+        "🏠 Home",
+        "🧹 Data Preprocessing",
+        "🔬 Prediction",
+        "📊 Model Performance",
+        "⭐ Feature Importance",
+        "ℹ️ About"
+    ]
 )
 
 # ============================================================
 # HOME PAGE
 # ============================================================
-
 
 if page == "🏠 Home":
 
@@ -128,9 +136,9 @@ if page == "🏠 Home":
 
     st.divider()
 
-    # ============================================================
+    # ========================================================
     # DATASET
-    # ============================================================
+    # ========================================================
 
     st.subheader("Dataset")
 
@@ -150,9 +158,9 @@ if page == "🏠 Home":
 
     st.divider()
 
-    # ============================================================
+    # ========================================================
     # DATASET OVERVIEW
-    # ============================================================
+    # ========================================================
 
     st.subheader("About the Dataset")
 
@@ -196,9 +204,9 @@ if page == "🏠 Home":
 
     st.divider()
 
-    # ============================================================
+    # ========================================================
     # MODELS
-    # ============================================================
+    # ========================================================
 
     st.subheader("Models Used")
 
@@ -227,9 +235,9 @@ if page == "🏠 Home":
 
     st.divider()
 
-    # ============================================================
+    # ========================================================
     # WORKFLOW
-    # ============================================================
+    # ========================================================
 
     st.subheader("Workflow")
 
@@ -261,9 +269,9 @@ if page == "🏠 Home":
 
     st.divider()
 
-    # ============================================================
+    # ========================================================
     # APPLICATION
-    # ============================================================
+    # ========================================================
 
     st.subheader("Application")
 
@@ -274,9 +282,9 @@ if page == "🏠 Home":
 
     st.divider()
 
-    # ============================================================
+    # ========================================================
     # DISCLAIMER
-    # ============================================================
+    # ========================================================
 
     st.info(
         "**Research & Educational Use Only:** "
@@ -284,7 +292,13 @@ if page == "🏠 Home":
         "It is intended for demonstration and educational purposes and "
         "should not be used for clinical diagnosis or treatment decisions."
     )
-elif page == "Data Preprocessing":
+
+# ============================================================
+# DATA PREPROCESSING PAGE
+# ============================================================
+
+elif page == "🧹 Data Preprocessing":
+
     st.title("🧹 Data Preprocessing")
 
     st.write(
@@ -350,7 +364,9 @@ elif page == "Data Preprocessing":
         "Samples": [212, 357]
     })
 
-    st.bar_chart(class_data.set_index("Class"))
+    st.bar_chart(
+        class_data.set_index("Class")
+    )
 
     st.write("Malignant class weight: 1.3382")
     st.write("Benign class weight: 0.7982")
@@ -378,6 +394,11 @@ Model Training
      ↓
 Model Evaluation
 """)
+
+# ============================================================
+# PREDICTION PAGE
+# ============================================================
+
 elif page == "🔬 Prediction":
 
     st.title("🔬 Tumor Classification")
@@ -495,7 +516,10 @@ elif page == "🔬 Prediction":
 
         # Neural Network
         nn_probability = float(
-            nn_model.predict(X_input_scaled, verbose=0)[0][0]
+            nn_model.predict(
+                X_input_scaled,
+                verbose=0
+            )[0][0]
         )
 
         nn_prediction = 1 if nn_probability >= 0.5 else 0
@@ -606,6 +630,10 @@ elif page == "🔬 Prediction":
             "only and must not be used as a medical diagnostic tool."
         )
 
+# ============================================================
+# MODEL PERFORMANCE PAGE
+# ============================================================
+
 elif page == "📊 Model Performance":
 
     st.title("📊 Model Performance")
@@ -617,10 +645,16 @@ elif page == "📊 Model Performance":
 
     # Test-set predictions
     lr_pred = lr_model.predict(X_test_scaled_metrics)
+
     rf_pred = rf_model.predict(X_TEST)
+
     svm_pred = svm_model.predict(X_test_scaled_metrics)
+
     nn_pred = (
-        nn_model.predict(X_test_scaled_metrics, verbose=0).ravel() >= 0.5
+        nn_model.predict(
+            X_test_scaled_metrics,
+            verbose=0
+        ).ravel() >= 0.5
     ).astype(int)
 
     from sklearn.metrics import (
@@ -638,28 +672,28 @@ elif page == "📊 Model Performance":
             "Neural Network"
         ],
         "Accuracy": [
-            accuracy_score(y_test, lr_pred),
-            accuracy_score(y_test, rf_pred),
-            accuracy_score(y_test, svm_pred),
-            accuracy_score(y_test, nn_pred)
+            accuracy_score(Y_TEST, lr_pred),
+            accuracy_score(Y_TEST, rf_pred),
+            accuracy_score(Y_TEST, svm_pred),
+            accuracy_score(Y_TEST, nn_pred)
         ],
         "Precision": [
-            precision_score(y_test, lr_pred),
-            precision_score(y_test, rf_pred),
-            precision_score(y_test, svm_pred),
-            precision_score(y_test, nn_pred)
+            precision_score(Y_TEST, lr_pred),
+            precision_score(Y_TEST, rf_pred),
+            precision_score(Y_TEST, svm_pred),
+            precision_score(Y_TEST, nn_pred)
         ],
         "Recall": [
-            recall_score(y_test, lr_pred),
-            recall_score(y_test, rf_pred),
-            recall_score(y_test, svm_pred),
-            recall_score(y_test, nn_pred)
+            recall_score(Y_TEST, lr_pred),
+            recall_score(Y_TEST, rf_pred),
+            recall_score(Y_TEST, svm_pred),
+            recall_score(Y_TEST, nn_pred)
         ],
         "F1-score": [
-            f1_score(y_test, lr_pred),
-            f1_score(y_test, rf_pred),
-            f1_score(y_test, svm_pred),
-            f1_score(y_test, nn_pred)
+            f1_score(Y_TEST, lr_pred),
+            f1_score(Y_TEST, rf_pred),
+            f1_score(Y_TEST, svm_pred),
+            f1_score(Y_TEST, nn_pred)
         ]
     })
 
@@ -686,16 +720,27 @@ elif page == "📊 Model Performance":
     }
 
     for model_name, predictions in confusion_data.items():
-        cm = confusion_matrix(y_test, predictions)
+
+        cm = confusion_matrix(
+            Y_TEST,
+            predictions
+        )
 
         st.markdown(f"**{model_name}**")
 
         plot_colors = get_plot_colors()
 
-        fig_cm, ax_cm = plt.subplots(figsize=(4.5, 3.5))
+        fig_cm, ax_cm = plt.subplots(
+            figsize=(4.5, 3.5)
+        )
 
-        fig_cm.patch.set_facecolor(plot_colors["background"])
-        ax_cm.set_facecolor(plot_colors["background"])
+        fig_cm.patch.set_facecolor(
+            plot_colors["background"]
+        )
+
+        ax_cm.set_facecolor(
+            plot_colors["background"]
+        )
 
         ax_cm.imshow(cm)
 
@@ -706,6 +751,7 @@ elif page == "📊 Model Performance":
             ["Malignant", "Benign"],
             color=plot_colors["text"]
         )
+
         ax_cm.set_yticklabels(
             ["Malignant", "Benign"],
             color=plot_colors["text"]
@@ -715,19 +761,25 @@ elif page == "📊 Model Performance":
             "Predicted Label",
             color=plot_colors["text"]
         )
+
         ax_cm.set_ylabel(
             "True Label",
             color=plot_colors["text"]
         )
+
         ax_cm.set_title(
             f"{model_name} - Confusion Matrix",
             color=plot_colors["text"]
         )
 
         for i in range(2):
+
             for j in range(2):
+
                 ax_cm.text(
-                    j, i, cm[i, j],
+                    j,
+                    i,
+                    cm[i, j],
                     ha="center",
                     va="center",
                     fontsize=14,
@@ -739,65 +791,129 @@ elif page == "📊 Model Performance":
         )
 
         for spine in ax_cm.spines.values():
-            spine.set_color(plot_colors["text"])
+            spine.set_color(
+                plot_colors["text"]
+            )
 
         plt.tight_layout()
+
         st.pyplot(fig_cm)
+
         plt.close(fig_cm)
+
+    # ========================================================
+    # ROC CURVE COMPARISON
+    # ========================================================
 
     st.subheader("ROC Curve Comparison")
 
     # Prepare test data
-    X_test_scaled = scaler.transform(X_test)
+    X_test_scaled = scaler.transform(X_TEST)
 
     # Predicted probabilities
-    lr_prob = lr_model.predict_proba(X_test_scaled)[:, 1]
-    rf_prob = rf_model.predict_proba(X_test)[:, 1]
-    svm_prob = svm_model.predict_proba(X_test_scaled)[:, 1]
-    nn_prob = nn_model.predict(X_test_scaled, verbose=0).ravel()
+    lr_prob = lr_model.predict_proba(
+        X_test_scaled
+    )[:, 1]
+
+    rf_prob = rf_model.predict_proba(
+        X_TEST
+    )[:, 1]
+
+    svm_prob = svm_model.predict_proba(
+        X_test_scaled
+    )[:, 1]
+
+    nn_prob = nn_model.predict(
+        X_test_scaled,
+        verbose=0
+    ).ravel()
 
     # ROC curves
-    lr_fpr, lr_tpr, _ = roc_curve(y_test, lr_prob)
-    rf_fpr, rf_tpr, _ = roc_curve(y_test, rf_prob)
-    svm_fpr, svm_tpr, _ = roc_curve(y_test, svm_prob)
-    nn_fpr, nn_tpr, _ = roc_curve(y_test, nn_prob)
+    lr_fpr, lr_tpr, _ = roc_curve(
+        Y_TEST,
+        lr_prob
+    )
+
+    rf_fpr, rf_tpr, _ = roc_curve(
+        Y_TEST,
+        rf_prob
+    )
+
+    svm_fpr, svm_tpr, _ = roc_curve(
+        Y_TEST,
+        svm_prob
+    )
+
+    nn_fpr, nn_tpr, _ = roc_curve(
+        Y_TEST,
+        nn_prob
+    )
 
     # AUC scores
-    lr_auc = roc_auc_score(y_test, lr_prob)
-    rf_auc = roc_auc_score(y_test, rf_prob)
-    svm_auc = roc_auc_score(y_test, svm_prob)
-    nn_auc = roc_auc_score(y_test, nn_prob)
+    lr_auc = roc_auc_score(
+        Y_TEST,
+        lr_prob
+    )
 
-    # ROC plot
+    rf_auc = roc_auc_score(
+        Y_TEST,
+        rf_prob
+    )
+
+    svm_auc = roc_auc_score(
+        Y_TEST,
+        svm_prob
+    )
+
+    nn_auc = roc_auc_score(
+        Y_TEST,
+        nn_prob
+    )
+
+    # ========================================================
+    # ROC PLOT
+    # ========================================================
+
     plot_colors = get_plot_colors()
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(
+        figsize=(8, 6)
+    )
 
-    fig.patch.set_facecolor(plot_colors["background"])
-    ax.set_facecolor(plot_colors["background"])
+    fig.patch.set_facecolor(
+        plot_colors["background"]
+    )
+
+    ax.set_facecolor(
+        plot_colors["background"]
+    )
 
     ax.plot(
-        lr_fpr, lr_tpr,
+        lr_fpr,
+        lr_tpr,
         linewidth=2.5,
         label=f"Logistic Regression (AUC = {lr_auc:.3f})"
     )
 
     ax.plot(
-        rf_fpr, rf_tpr,
+        rf_fpr,
+        rf_tpr,
         linewidth=2.5,
         linestyle="--",
         label=f"Random Forest (AUC = {rf_auc:.3f})"
     )
 
     ax.plot(
-        svm_fpr, svm_tpr,
+        svm_fpr,
+        svm_tpr,
         linewidth=2.5,
         linestyle="-.",
         label=f"SVM (AUC = {svm_auc:.3f})"
     )
 
     ax.plot(
-        nn_fpr, nn_tpr,
+        nn_fpr,
+        nn_tpr,
         linewidth=2.5,
         linestyle=":",
         label=f"Neural Network (AUC = {nn_auc:.3f})"
@@ -811,14 +927,22 @@ elif page == "📊 Model Performance":
         label="Random Classifier (AUC = 0.500)"
     )
 
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1.02)
+    ax.set_xlim(
+        0,
+        1
+    )
+
+    ax.set_ylim(
+        0,
+        1.02
+    )
 
     ax.set_xlabel(
         "False Positive Rate",
         fontsize=12,
         color=plot_colors["text"]
     )
+
     ax.set_ylabel(
         "True Positive Rate",
         fontsize=12,
@@ -837,7 +961,9 @@ elif page == "📊 Model Performance":
     )
 
     for spine in ax.spines.values():
-        spine.set_color(plot_colors["text"])
+        spine.set_color(
+            plot_colors["text"]
+        )
 
     legend = ax.legend(
         loc="lower right",
@@ -848,12 +974,15 @@ elif page == "📊 Model Performance":
     legend.get_frame().set_facecolor(
         plot_colors["background"]
     )
+
     legend.get_frame().set_edgecolor(
         plot_colors["grid"]
     )
 
     for label in legend.get_texts():
-        label.set_color(plot_colors["text"])
+        label.set_color(
+            plot_colors["text"]
+        )
 
     ax.grid(
         True,
@@ -865,9 +994,13 @@ elif page == "📊 Model Performance":
     plt.tight_layout()
 
     st.pyplot(fig)
+
     plt.close(fig)
 
-    # AUC table
+    # ========================================================
+    # AUC TABLE
+    # ========================================================
+
     st.subheader("ROC-AUC Scores")
 
     auc_df = pd.DataFrame({
@@ -893,19 +1026,28 @@ elif page == "📊 Model Performance":
         hide_index=True
     )
 
+# ============================================================
+# FEATURE IMPORTANCE PAGE
+# ============================================================
+
 elif page == "⭐ Feature Importance":
 
     st.header("Feature Importance")
 
     try:
 
-        importance_df = pd.DataFrame(FEATURE_IMPORTANCE).copy()
+        importance_df = pd.DataFrame(
+            FEATURE_IMPORTANCE
+        ).copy()
 
-        # Rank features from 1 to 10
+        # Rank features
         importance_df.insert(
             0,
             "Rank",
-            range(1, len(importance_df) + 1)
+            range(
+                1,
+                len(importance_df) + 1
+            )
         )
 
         st.dataframe(
@@ -973,3 +1115,4 @@ elif page == "ℹ️ About":
         "Developed as an Application-Oriented Mini-Project "
         "for Artificial Intelligence in Healthcare."
     )
+```

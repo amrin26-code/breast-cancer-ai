@@ -270,7 +270,7 @@ if page == "🏠 Home":
         "It is intended for demonstration and educational purposes and "
         "should not be used for clinical diagnosis or treatment decisions."
     )
-    elif page == "Data Preprocessing":
+    if page == "Data Preprocessing":
     st.title("🧹 Data Preprocessing")
 
     st.write(

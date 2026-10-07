@@ -102,13 +102,14 @@ st.sidebar.title("Navigation")
 
 page = st.sidebar.radio(
     "Go to",
-    [
-        "🏠 Home",
-        "🔬 Prediction",
-        "📊 Model Performance",
-        "⭐ Feature Importance",
-        "ℹ️ About"
-    ]
+[
+    "🏠 Home",
+    "🧹 Data Preprocessing",
+    "🔬 Prediction",
+    "📊 Model Performance",
+    "⭐ Feature Importance",
+    "ℹ️ About"
+]
 )
 
 # ============================================================
@@ -612,7 +613,7 @@ elif page == "📊 Model Performance":
     st.subheader("Classification Performance")
 
     # Prepare test data
-    X_test_scaled_metrics = scaler.transform(X_test)
+    X_test_scaled_metrics = scaler.transform(X_TEST)
 
     # Test-set predictions
     lr_pred = lr_model.predict(X_test_scaled_metrics)

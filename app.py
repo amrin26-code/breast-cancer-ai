@@ -270,8 +270,8 @@ page = st.sidebar.radio(
         "It is intended for demonstration and educational purposes and "
         "should not be used for clinical diagnosis or treatment decisions."
     )
-    if page == "Data Preprocessing":
-     st.title("🧹 Data Preprocessing"))
+ if page == "Data Preprocessing":
+    st.title("🧹 Data Preprocessing")
 
     st.write(
         "The Wisconsin Breast Cancer Diagnostic Dataset was "

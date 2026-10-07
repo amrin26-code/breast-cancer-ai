@@ -284,7 +284,7 @@ if page == "🏠 Home":
         "It is intended for demonstration and educational purposes and "
         "should not be used for clinical diagnosis or treatment decisions."
     )
-if page == "Data Preprocessing":
+elif page == "Data Preprocessing":
     st.title("🧹 Data Preprocessing")
 
     st.write(
@@ -617,7 +617,7 @@ elif page == "📊 Model Performance":
 
     # Test-set predictions
     lr_pred = lr_model.predict(X_test_scaled_metrics)
-    rf_pred = rf_model.predict(X_test)
+    rf_pred = rf_model.predict(X_TEST)
     svm_pred = svm_model.predict(X_test_scaled_metrics)
     nn_pred = (
         nn_model.predict(X_test_scaled_metrics, verbose=0).ravel() >= 0.5

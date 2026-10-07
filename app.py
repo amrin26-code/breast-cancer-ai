@@ -69,13 +69,13 @@ FEATURE_NAMES = joblib.load(
     os.path.join(MODEL_DIR, "feature_names.pkl")
 )
 
-METRICS = joblib.load(
-    os.path.join(MODEL_DIR, "metrics.pkl")
-)
+METRICS = joblib.load("models/metrics.pkl")
+X_TEST = joblib.load("models/X_test.pkl")
+Y_TEST = joblib.load("models/y_test.pkl")
 
-# Load original test dataset used during model evaluation
-X_test = joblib.load("models/X_test.pkl")
-y_test = joblib.load("models/y_test.pkl")
+PREPROCESSING_SUMMARY = joblib.load(
+    "models/preprocessing_summary.pkl"
+)
 
 FEATURE_IMPORTANCE = joblib.load(
     os.path.join(MODEL_DIR, "feature_importance.pkl")
@@ -270,6 +270,100 @@ if page == "🏠 Home":
         "It is intended for demonstration and educational purposes and "
         "should not be used for clinical diagnosis or treatment decisions."
     )
+    elif page == "Data Preprocessing":
+    st.title("🧹 Data Preprocessing")
+
+    st.write(
+        "The Wisconsin Breast Cancer Diagnostic Dataset was "
+        "preprocessed before training the classification models."
+    )
+
+    st.subheader("1. Dataset Overview")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Total Samples", "569")
+
+    with col2:
+        st.metric("Features", "30")
+
+    with col3:
+        st.metric("Classes", "2")
+
+    st.subheader("2. Data Quality Check")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric("Missing Values", "0")
+
+    with col2:
+        st.metric("Duplicate Samples", "0")
+
+    st.success("✓ No missing values or duplicate samples were detected.")
+
+    st.subheader("3. Train-Test Split")
+
+    st.write("""
+    • 80% training data  
+    • 20% testing data  
+    • Stratified splitting was used to maintain class proportions  
+    • Random state = 42
+    """)
+
+    st.subheader("4. Feature Standardization")
+
+    st.write("""
+    StandardScaler was used for feature standardization.
+
+    • Logistic Regression → standardized data  
+    • SVM → standardized data  
+    • Neural Network → standardized data  
+    • Random Forest → original feature scale
+    """)
+
+    st.subheader("5. Handling Class Imbalance")
+
+    st.write("""
+    The dataset contains more benign than malignant samples.
+    Balanced class weights were used during model training to give
+    greater importance to the minority malignant class.
+    """)
+
+    class_data = pd.DataFrame({
+        "Class": ["Malignant", "Benign"],
+        "Samples": [212, 357]
+    })
+
+    st.bar_chart(class_data.set_index("Class"))
+
+    st.write("Malignant class weight: 1.3382")
+    st.write("Benign class weight: 0.7982")
+
+    st.info(
+        "Class imbalance was handled using balanced class weighting."
+    )
+
+    st.subheader("6. Preprocessing Workflow")
+
+    st.code("""
+Raw Dataset
+     ↓
+Missing-Value Check
+     ↓
+Duplicate Check
+     ↓
+Stratified 80:20 Train-Test Split
+     ↓
+Feature Standardization
+     ↓
+Balanced Class Weights
+     ↓
+Model Training
+     ↓
+Model Evaluation
+""")
 elif page == "🔬 Prediction":
 
     st.title("🔬 Tumor Classification")

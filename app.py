@@ -103,7 +103,7 @@ page = st.sidebar.radio(
 # ============================================================
 
 
- == "🏠 Home":
+if page == "🏠 Home":
 
     st.title("🧬 AI-Based Breast Cancer Diagnostic Support")
 

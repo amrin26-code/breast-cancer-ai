@@ -1353,10 +1353,11 @@ st.pyplot(fig_nn)
 
 plt.close(fig_nn)
 
-    st.caption(
-        "The architecture shown above is generated directly from "
-        "the trained TensorFlow/Keras neural network loaded by the application."
-    )
+     plt.tight_layout()
+
+    st.pyplot(fig_nn)
+
+    plt.close(fig_nn)
 
 # ============================================================
 # FEATURE IMPORTANCE PAGE

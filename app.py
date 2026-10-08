@@ -1140,7 +1140,6 @@ elif page == "📊 Model Performance":
         use_container_width=True,
         hide_index=True
     )
-    ```python
     # ========================================================
     # NEURAL NETWORK ARCHITECTURE
     # ========================================================

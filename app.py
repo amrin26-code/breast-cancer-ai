@@ -1140,6 +1140,174 @@ elif page == "📊 Model Performance":
         use_container_width=True,
         hide_index=True
     )
+    ```python
+    # ========================================================
+    # NEURAL NETWORK ARCHITECTURE
+    # ========================================================
+
+    st.subheader("Neural Network Architecture")
+
+    st.write(
+        "The feed-forward neural network used for breast cancer "
+        "classification consists of an input layer representing the "
+        "diagnostic features, followed by fully connected layers and "
+        "a sigmoid output layer for binary classification."
+    )
+
+    # --------------------------------------------------------
+    # DISPLAY ACTUAL TRAINED MODEL ARCHITECTURE
+    # --------------------------------------------------------
+
+    architecture_data = []
+
+    for i, layer in enumerate(nn_model.layers):
+
+        output_shape = layer.output.shape
+
+        architecture_data.append({
+            "Layer": i + 1,
+            "Layer Type": layer.__class__.__name__,
+            "Output Shape": str(tuple(output_shape)),
+            "Parameters": layer.count_params()
+        })
+
+    architecture_df = pd.DataFrame(
+        architecture_data
+    )
+
+    st.dataframe(
+        architecture_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # --------------------------------------------------------
+    # VISUAL NETWORK STRUCTURE
+    # --------------------------------------------------------
+
+    st.markdown("### Network Structure")
+
+    network_layers = []
+
+    for layer in nn_model.layers:
+
+        if isinstance(layer, tf.keras.layers.Dense):
+
+            units = layer.units
+            activation = layer.activation.__name__
+
+            network_layers.append(
+                f"Dense ({units})\n{activation}"
+            )
+
+        else:
+
+            network_layers.append(
+                layer.__class__.__name__
+            )
+
+    # --------------------------------------------------------
+    # CREATE ARCHITECTURE DIAGRAM
+    # --------------------------------------------------------
+
+    plot_colors = get_plot_colors()
+
+    fig_nn, ax_nn = plt.subplots(
+        figsize=(12, 3.5)
+    )
+
+    fig_nn.patch.set_facecolor(
+        plot_colors["background"]
+    )
+
+    ax_nn.set_facecolor(
+        plot_colors["background"]
+    )
+
+    ax_nn.axis("off")
+
+    if len(network_layers) == 1:
+
+        x_positions = [0.5]
+
+    else:
+
+        x_positions = np.linspace(
+            0.08,
+            0.92,
+            len(network_layers)
+        )
+
+    for i, (x, layer_text) in enumerate(
+        zip(x_positions, network_layers)
+    ):
+
+        ax_nn.text(
+            x,
+            0.5,
+            layer_text,
+            ha="center",
+            va="center",
+            fontsize=11,
+            color=plot_colors["text"],
+            bbox=dict(
+                boxstyle="round,pad=0.6",
+                facecolor=plot_colors["background"],
+                edgecolor=plot_colors["text"],
+                linewidth=1.5
+            )
+        )
+
+        # Connect layers with arrows
+
+        if i < len(network_layers) - 1:
+
+            ax_nn.annotate(
+                "",
+                xy=(
+                    x_positions[i + 1] - 0.07,
+                    0.5
+                ),
+                xytext=(
+                    x + 0.07,
+                    0.5
+                ),
+                arrowprops=dict(
+                    arrowstyle="->",
+                    linewidth=1.5,
+                    color=plot_colors["text"]
+                )
+            )
+
+    ax_nn.set_xlim(
+        0,
+        1
+    )
+
+    ax_nn.set_ylim(
+        0,
+        1
+    )
+
+    ax_nn.set_title(
+        "Feed-Forward Neural Network Architecture",
+        fontsize=14,
+        fontweight="bold",
+        color=plot_colors["text"]
+    )
+
+    plt.tight_layout()
+
+    st.pyplot(fig_nn)
+
+    plt.close(fig_nn)
+
+    st.caption(
+        "The architecture shown above is generated directly from "
+        "the trained TensorFlow/Keras neural network loaded by the application."
+    )
+```
+
 
 # ============================================================
 # FEATURE IMPORTANCE PAGE

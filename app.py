@@ -1350,11 +1350,11 @@ elif page == "⭐ Feature Importance":
         importance_df = pd.DataFrame(
             FEATURE_IMPORTANCE
         ).copy()
-            "Rank",
 
         # Rank features
         importance_df.insert(
             0,
+            "Rank",
             range(
                 1,
                 len(importance_df) + 1

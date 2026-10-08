@@ -1305,8 +1305,6 @@ elif page == "📊 Model Performance":
         "The architecture shown above is generated directly from "
         "the trained TensorFlow/Keras neural network loaded by the application."
     )
-```
-
 
 # ============================================================
 # FEATURE IMPORTANCE PAGE

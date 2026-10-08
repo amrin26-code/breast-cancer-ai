@@ -1353,12 +1353,6 @@ st.pyplot(fig_nn)
 
 plt.close(fig_nn)
 
-     plt.tight_layout()
-
-    st.pyplot(fig_nn)
-
-    plt.close(fig_nn)
-
 # ============================================================
 # FEATURE IMPORTANCE PAGE
 # ============================================================

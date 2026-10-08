@@ -1180,178 +1180,162 @@ elif page == "📊 Model Performance":
         hide_index=True
     )
 
-# --------------------------------------------------------
-# NEURAL NETWORK ARCHITECTURE DIAGRAM
-# --------------------------------------------------------
+    # --------------------------------------------------------
+    # NEURAL NETWORK ARCHITECTURE DIAGRAM
+    # --------------------------------------------------------
 
-st.markdown("### Network Architecture")
+    st.markdown("### Network Architecture")
 
-# Get Dense layers from the trained model
-dense_layers = [
-    layer for layer in nn_model.layers
-    if isinstance(layer, tf.keras.layers.Dense)
-]
+    # Get Dense layers from the trained model
+    dense_layers = [
+        layer for layer in nn_model.layers
+        if isinstance(layer, tf.keras.layers.Dense)
+    ]
 
-# Number of input features
-input_units = len(feature_names)
+    # Number of input features
+    input_units = len(FEATURE_NAMES)
 
-# Layer information
-layer_units = [input_units] + [
-    layer.units for layer in dense_layers
-]
+    # Layer information
+    layer_units = [input_units] + [
+        layer.units for layer in dense_layers
+    ]
 
-layer_labels = (
-    ["Input Layer"] +
-    [f"Hidden Layer {i}" for i in range(1, len(dense_layers))] +
-    ["Output Layer"]
-)
-
-plot_colors = get_plot_colors()
-
-fig_nn, ax_nn = plt.subplots(figsize=(12, 6))
-
-fig_nn.patch.set_facecolor(plot_colors["background"])
-ax_nn.set_facecolor(plot_colors["background"])
-ax_nn.axis("off")
-
-# X positions for layers
-x_positions = np.linspace(
-    0.08,
-    0.92,
-    len(layer_units)
-)
-
-# Maximum nodes displayed per layer
-max_nodes = 8
-
-# Store node positions
-node_positions = []
-
-for layer_index, (x, units) in enumerate(
-    zip(x_positions, layer_units)
-):
-
-    # Show maximum 8 representative neurons
-    n_display = min(units, max_nodes)
-
-    y_positions = np.linspace(
-        0.15,
-        0.85,
-        n_display
+    layer_labels = (
+        ["Input Layer"] +
+        [f"Hidden Layer {i}" for i in range(1, len(dense_layers))] +
+        ["Output Layer"]
     )
 
-    layer_nodes = []
+    plot_colors = get_plot_colors()
 
-    for y in y_positions:
+    fig_nn, ax_nn = plt.subplots(figsize=(12, 6))
 
-        ax_nn.scatter(
-            x,
-            y,
-            s=900,
-            facecolors=plot_colors["background"],
-            edgecolors=plot_colors["text"],
-            linewidths=1.8,
-            zorder=3
+    fig_nn.patch.set_facecolor(plot_colors["background"])
+    ax_nn.set_facecolor(plot_colors["background"])
+    ax_nn.axis("off")
+
+    x_positions = np.linspace(
+        0.08,
+        0.92,
+        len(layer_units)
+    )
+
+    max_nodes = 8
+    node_positions = []
+
+    for layer_index, (x, units) in enumerate(
+        zip(x_positions, layer_units)
+    ):
+
+        n_display = min(units, max_nodes)
+
+        y_positions = np.linspace(
+            0.15,
+            0.85,
+            n_display
         )
 
-        layer_nodes.append((x, y))
+        layer_nodes = []
 
-    node_positions.append(layer_nodes)
+        for y in y_positions:
 
-    # Layer title
-    ax_nn.text(
-        x,
-        0.96,
-        layer_labels[layer_index],
-        ha="center",
-        va="center",
-        fontsize=12,
-        fontweight="bold",
-        color=plot_colors["text"]
-    )
-
-    # Number of neurons
-    if layer_index == 0:
-        neuron_text = f"{units} features"
-
-    elif layer_index == len(layer_units) - 1:
-        neuron_text = f"{units} neuron"
-
-    else:
-        neuron_text = f"{units} neurons"
-
-    ax_nn.text(
-        x,
-        0.07,
-        neuron_text,
-        ha="center",
-        va="center",
-        fontsize=10,
-        color=plot_colors["text"]
-    )
-
-# --------------------------------------------------------
-# CONNECT THE LAYERS
-# --------------------------------------------------------
-
-for i in range(len(node_positions) - 1):
-
-    current_nodes = node_positions[i]
-    next_nodes = node_positions[i + 1]
-
-    for x1, y1 in current_nodes:
-        for x2, y2 in next_nodes:
-
-            ax_nn.plot(
-                [x1, x2],
-                [y1, y2],
-                linewidth=0.7,
-                alpha=0.35,
-                color=plot_colors["text"],
-                zorder=1
+            ax_nn.scatter(
+                x,
+                y,
+                s=900,
+                facecolors=plot_colors["background"],
+                edgecolors=plot_colors["text"],
+                linewidths=1.8,
+                zorder=3
             )
 
-# --------------------------------------------------------
-# ADD ACTIVATION LABELS
-# --------------------------------------------------------
+            layer_nodes.append((x, y))
 
-for i, layer in enumerate(dense_layers):
+        node_positions.append(layer_nodes)
 
-    activation = layer.activation.__name__
+        ax_nn.text(
+            x,
+            0.96,
+            layer_labels[layer_index],
+            ha="center",
+            va="center",
+            fontsize=12,
+            fontweight="bold",
+            color=plot_colors["text"]
+        )
 
-    x = x_positions[i + 1]
+        if layer_index == 0:
+            neuron_text = f"{units} features"
 
-    if i == len(dense_layers) - 1:
-        label = f"Activation: {activation}"
-    else:
-        label = f"Activation: {activation}"
+        elif layer_index == len(layer_units) - 1:
+            neuron_text = f"{units} neuron"
 
-    ax_nn.text(
-        x,
-        0.01,
-        label,
-        ha="center",
-        va="center",
-        fontsize=9,
-        color=plot_colors["text"]
+        else:
+            neuron_text = f"{units} neurons"
+
+        ax_nn.text(
+            x,
+            0.07,
+            neuron_text,
+            ha="center",
+            va="center",
+            fontsize=10,
+            color=plot_colors["text"]
+        )
+
+    # CONNECT THE LAYERS
+
+    for i in range(len(node_positions) - 1):
+
+        current_nodes = node_positions[i]
+        next_nodes = node_positions[i + 1]
+
+        for x1, y1 in current_nodes:
+            for x2, y2 in next_nodes:
+
+                ax_nn.plot(
+                    [x1, x2],
+                    [y1, y2],
+                    linewidth=0.7,
+                    alpha=0.35,
+                    color=plot_colors["text"],
+                    zorder=1
+                )
+
+    # ACTIVATION LABELS
+
+    for i, layer in enumerate(dense_layers):
+
+        activation = layer.activation.__name__
+
+        x = x_positions[i + 1]
+
+        ax_nn.text(
+            x,
+            0.01,
+            f"Activation: {activation}",
+            ha="center",
+            va="center",
+            fontsize=9,
+            color=plot_colors["text"]
+        )
+
+    ax_nn.set_xlim(0, 1)
+    ax_nn.set_ylim(0, 1)
+
+    ax_nn.set_title(
+        "Feed-Forward Neural Network Architecture",
+        fontsize=15,
+        fontweight="bold",
+        color=plot_colors["text"],
+        pad=20
     )
 
-ax_nn.set_xlim(0, 1)
-ax_nn.set_ylim(0, 1)
+    plt.tight_layout()
 
-ax_nn.set_title(
-    "Feed-Forward Neural Network Architecture",
-    fontsize=15,
-    fontweight="bold",
-    color=plot_colors["text"],
-    pad=20
-)
+    st.pyplot(fig_nn)
 
-plt.tight_layout()
-
-st.pyplot(fig_nn)
-
-plt.close(fig_nn)
+    plt.close(fig_nn)
 
 # ============================================================
 # FEATURE IMPORTANCE PAGE
@@ -1366,11 +1350,11 @@ elif page == "⭐ Feature Importance":
         importance_df = pd.DataFrame(
             FEATURE_IMPORTANCE
         ).copy()
+            "Rank",
 
         # Rank features
         importance_df.insert(
             0,
-            "Rank",
             range(
                 1,
                 len(importance_df) + 1

@@ -1,5 +1,4 @@
 
-```python
 import streamlit as st
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, roc_auc_score
@@ -1115,4 +1114,3 @@ elif page == "ℹ️ About":
         "Developed as an Application-Oriented Mini-Project "
         "for Artificial Intelligence in Healthcare."
     )
-```

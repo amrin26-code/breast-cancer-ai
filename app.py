@@ -1180,126 +1180,178 @@ elif page == "📊 Model Performance":
         hide_index=True
     )
 
-    # --------------------------------------------------------
-    # VISUAL NETWORK STRUCTURE
-    # --------------------------------------------------------
+# --------------------------------------------------------
+# NEURAL NETWORK ARCHITECTURE DIAGRAM
+# --------------------------------------------------------
 
-    st.markdown("### Network Structure")
+st.markdown("### Network Architecture")
 
-    network_layers = []
+# Get Dense layers from the trained model
+dense_layers = [
+    layer for layer in nn_model.layers
+    if isinstance(layer, tf.keras.layers.Dense)
+]
 
-    for layer in nn_model.layers:
+# Number of input features
+input_units = len(feature_names)
 
-        if isinstance(layer, tf.keras.layers.Dense):
+# Layer information
+layer_units = [input_units] + [
+    layer.units for layer in dense_layers
+]
 
-            units = layer.units
-            activation = layer.activation.__name__
+layer_labels = (
+    ["Input Layer"] +
+    [f"Hidden Layer {i}" for i in range(1, len(dense_layers))] +
+    ["Output Layer"]
+)
 
-            network_layers.append(
-                f"Dense ({units})\n{activation}"
-            )
+plot_colors = get_plot_colors()
 
-        else:
+fig_nn, ax_nn = plt.subplots(figsize=(12, 6))
 
-            network_layers.append(
-                layer.__class__.__name__
-            )
+fig_nn.patch.set_facecolor(plot_colors["background"])
+ax_nn.set_facecolor(plot_colors["background"])
+ax_nn.axis("off")
 
-    # --------------------------------------------------------
-    # CREATE ARCHITECTURE DIAGRAM
-    # --------------------------------------------------------
+# X positions for layers
+x_positions = np.linspace(
+    0.08,
+    0.92,
+    len(layer_units)
+)
 
-    plot_colors = get_plot_colors()
+# Maximum nodes displayed per layer
+max_nodes = 8
 
-    fig_nn, ax_nn = plt.subplots(
-        figsize=(12, 3.5)
+# Store node positions
+node_positions = []
+
+for layer_index, (x, units) in enumerate(
+    zip(x_positions, layer_units)
+):
+
+    # Show maximum 8 representative neurons
+    n_display = min(units, max_nodes)
+
+    y_positions = np.linspace(
+        0.15,
+        0.85,
+        n_display
     )
 
-    fig_nn.patch.set_facecolor(
-        plot_colors["background"]
-    )
+    layer_nodes = []
 
-    ax_nn.set_facecolor(
-        plot_colors["background"]
-    )
+    for y in y_positions:
 
-    ax_nn.axis("off")
-
-    if len(network_layers) == 1:
-
-        x_positions = [0.5]
-
-    else:
-
-        x_positions = np.linspace(
-            0.08,
-            0.92,
-            len(network_layers)
-        )
-
-    for i, (x, layer_text) in enumerate(
-        zip(x_positions, network_layers)
-    ):
-
-        ax_nn.text(
+        ax_nn.scatter(
             x,
-            0.5,
-            layer_text,
-            ha="center",
-            va="center",
-            fontsize=11,
-            color=plot_colors["text"],
-            bbox=dict(
-                boxstyle="round,pad=0.6",
-                facecolor=plot_colors["background"],
-                edgecolor=plot_colors["text"],
-                linewidth=1.5
-            )
+            y,
+            s=900,
+            facecolors=plot_colors["background"],
+            edgecolors=plot_colors["text"],
+            linewidths=1.8,
+            zorder=3
         )
 
-        # Connect layers with arrows
+        layer_nodes.append((x, y))
 
-        if i < len(network_layers) - 1:
+    node_positions.append(layer_nodes)
 
-            ax_nn.annotate(
-                "",
-                xy=(
-                    x_positions[i + 1] - 0.07,
-                    0.5
-                ),
-                xytext=(
-                    x + 0.07,
-                    0.5
-                ),
-                arrowprops=dict(
-                    arrowstyle="->",
-                    linewidth=1.5,
-                    color=plot_colors["text"]
-                )
-            )
-
-    ax_nn.set_xlim(
-        0,
-        1
-    )
-
-    ax_nn.set_ylim(
-        0,
-        1
-    )
-
-    ax_nn.set_title(
-        "Feed-Forward Neural Network Architecture",
-        fontsize=14,
+    # Layer title
+    ax_nn.text(
+        x,
+        0.96,
+        layer_labels[layer_index],
+        ha="center",
+        va="center",
+        fontsize=12,
         fontweight="bold",
         color=plot_colors["text"]
     )
 
-    plt.tight_layout()
+    # Number of neurons
+    if layer_index == 0:
+        neuron_text = f"{units} features"
 
-    st.pyplot(fig_nn)
+    elif layer_index == len(layer_units) - 1:
+        neuron_text = f"{units} neuron"
 
-    plt.close(fig_nn)
+    else:
+        neuron_text = f"{units} neurons"
+
+    ax_nn.text(
+        x,
+        0.07,
+        neuron_text,
+        ha="center",
+        va="center",
+        fontsize=10,
+        color=plot_colors["text"]
+    )
+
+# --------------------------------------------------------
+# CONNECT THE LAYERS
+# --------------------------------------------------------
+
+for i in range(len(node_positions) - 1):
+
+    current_nodes = node_positions[i]
+    next_nodes = node_positions[i + 1]
+
+    for x1, y1 in current_nodes:
+        for x2, y2 in next_nodes:
+
+            ax_nn.plot(
+                [x1, x2],
+                [y1, y2],
+                linewidth=0.7,
+                alpha=0.35,
+                color=plot_colors["text"],
+                zorder=1
+            )
+
+# --------------------------------------------------------
+# ADD ACTIVATION LABELS
+# --------------------------------------------------------
+
+for i, layer in enumerate(dense_layers):
+
+    activation = layer.activation.__name__
+
+    x = x_positions[i + 1]
+
+    if i == len(dense_layers) - 1:
+        label = f"Activation: {activation}"
+    else:
+        label = f"Activation: {activation}"
+
+    ax_nn.text(
+        x,
+        0.01,
+        label,
+        ha="center",
+        va="center",
+        fontsize=9,
+        color=plot_colors["text"]
+    )
+
+ax_nn.set_xlim(0, 1)
+ax_nn.set_ylim(0, 1)
+
+ax_nn.set_title(
+    "Feed-Forward Neural Network Architecture",
+    fontsize=15,
+    fontweight="bold",
+    color=plot_colors["text"],
+    pad=20
+)
+
+plt.tight_layout()
+
+st.pyplot(fig_nn)
+
+plt.close(fig_nn)
 
     st.caption(
         "The architecture shown above is generated directly from "

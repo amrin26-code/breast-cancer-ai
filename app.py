@@ -298,101 +298,217 @@ if page == "🏠 Home":
 
 elif page == "🧹 Data Preprocessing":
 
-    st.title("🧹 Data Preprocessing")
+    st.header("🧹 Data Preprocessing")
 
     st.write(
-        "The Wisconsin Breast Cancer Diagnostic Dataset was "
-        "preprocessed before training the classification models."
+        "This section presents the preprocessing steps applied to the "
+        "Wisconsin Breast Cancer Diagnostic Dataset before model training."
     )
 
+    # ---------------------------------------------------------
+    # 1. DATASET OVERVIEW
+    # ---------------------------------------------------------
     st.subheader("1. Dataset Overview")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
-    with col1:
-        st.metric("Total Samples", "569")
+    col1.metric("Total Samples", PREPROCESSING_SUMMARY["Total Samples"])
+    col2.metric("Features", PREPROCESSING_SUMMARY["Total Features"])
+    col3.metric("Malignant", PREPROCESSING_SUMMARY["Malignant Samples"])
+    col4.metric("Benign", PREPROCESSING_SUMMARY["Benign Samples"])
 
-    with col2:
-        st.metric("Features", "30")
+    st.write("### Data Quality Check")
 
-    with col3:
-        st.metric("Classes", "2")
-
-    st.subheader("2. Data Quality Check")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.metric("Missing Values", "0")
-
-    with col2:
-        st.metric("Duplicate Samples", "0")
-
-    st.success("✓ No missing values or duplicate samples were detected.")
-
-    st.subheader("3. Train-Test Split")
-
-    st.write("""
-    • 80% training data  
-    • 20% testing data  
-    • Stratified splitting was used to maintain class proportions  
-    • Random state = 42
-    """)
-
-    st.subheader("4. Feature Standardization")
-
-    st.write("""
-    StandardScaler was used for feature standardization.
-
-    • Logistic Regression → standardized data  
-    • SVM → standardized data  
-    • Neural Network → standardized data  
-    • Random Forest → original feature scale
-    """)
-
-    st.subheader("5. Handling Class Imbalance")
-
-    st.write("""
-    The dataset contains more benign than malignant samples.
-    Balanced class weights were used during model training to give
-    greater importance to the minority malignant class.
-    """)
-
-    class_data = pd.DataFrame({
-        "Class": ["Malignant", "Benign"],
-        "Samples": [212, 357]
+    quality_df = pd.DataFrame({
+        "Check": [
+            "Missing Values",
+            "Duplicate Samples"
+        ],
+        "Result": [
+            PREPROCESSING_SUMMARY["Missing Values"],
+            PREPROCESSING_SUMMARY["Duplicate Samples"]
+        ],
+        "Status": [
+            "✓ No missing values",
+            "✓ No duplicate samples"
+        ]
     })
 
-    st.bar_chart(
-        class_data.set_index("Class")
+    st.dataframe(
+        quality_df,
+        use_container_width=True,
+        hide_index=True
     )
 
-    st.write("Malignant class weight: 1.3382")
-    st.write("Benign class weight: 0.7982")
+    # ---------------------------------------------------------
+    # 2. CLASS DISTRIBUTION
+    # ---------------------------------------------------------
+    st.subheader("2. Class Distribution")
+
+    st.write(
+        "The dataset contains fewer malignant cases than benign cases. "
+        "Therefore, class imbalance was considered during model training."
+    )
+
+    class_counts = pd.DataFrame({
+        "Class": ["Malignant", "Benign"],
+        "Samples": [
+            PREPROCESSING_SUMMARY["Malignant Samples"],
+            PREPROCESSING_SUMMARY["Benign Samples"]
+        ]
+    })
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+
+    ax.bar(
+        class_counts["Class"],
+        class_counts["Samples"]
+    )
+
+    ax.set_ylabel("Number of Samples")
+    ax.set_title("Class Distribution Before Training")
+
+    for i, value in enumerate(class_counts["Samples"]):
+        ax.text(i, value + 5, str(value), ha="center")
+
+    st.pyplot(fig)
+    plt.close(fig)
+
+    # ---------------------------------------------------------
+    # 3. TRAIN-TEST SPLIT
+    # ---------------------------------------------------------
+    st.subheader("3. Train-Test Split")
+
+    split_col1, split_col2 = st.columns(2)
+
+    split_col1.metric(
+        "Training Set",
+        "80%"
+    )
+
+    split_col2.metric(
+        "Testing Set",
+        "20%"
+    )
 
     st.info(
-        "Class imbalance was handled using balanced class weighting."
+        "A stratified 80:20 train-test split was used with random state 42. "
+        "Stratification preserves the malignant/benign class proportion "
+        "in both training and testing sets."
     )
 
+    # ---------------------------------------------------------
+    # 4. FEATURE STANDARDIZATION
+    # ---------------------------------------------------------
+    st.subheader("4. Feature Standardization")
+
+    st.write(
+        "StandardScaler was used for models that require feature scaling."
+    )
+
+    scaling_df = pd.DataFrame({
+        "Model": [
+            "Logistic Regression",
+            "Support Vector Machine",
+            "Neural Network",
+            "Random Forest"
+        ],
+        "Scaling": [
+            "StandardScaler",
+            "StandardScaler",
+            "StandardScaler",
+            "Not required"
+        ]
+    })
+
+    st.dataframe(
+        scaling_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.success(
+        "The scaler was fitted using the training data only and then "
+        "applied to the test data, preventing data leakage."
+    )
+
+    # ---------------------------------------------------------
+    # 5. CLASS IMBALANCE HANDLING
+    # ---------------------------------------------------------
+    st.subheader("5. Class Imbalance Handling")
+
+    st.write(
+        "Balanced class weights were used during model training. "
+        "The minority malignant class receives a higher weight so that "
+        "malignant cases are given greater importance during learning."
+    )
+
+    weight_df = pd.DataFrame({
+        "Class": [
+            "Malignant",
+            "Benign"
+        ],
+        "Samples": [
+            PREPROCESSING_SUMMARY["Malignant Samples"],
+            PREPROCESSING_SUMMARY["Benign Samples"]
+        ],
+        "Class Weight": [
+            PREPROCESSING_SUMMARY["Malignant Class Weight"],
+            PREPROCESSING_SUMMARY["Benign Class Weight"]
+        ]
+    })
+
+    st.dataframe(
+        weight_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # ---------------------------------------------------------
+    # 6. PREPROCESSING SUMMARY
+    # ---------------------------------------------------------
     st.subheader("6. Preprocessing Workflow")
 
-    st.code("""
-Raw Dataset
-     ↓
-Missing-Value Check
-     ↓
-Duplicate Check
-     ↓
-Stratified 80:20 Train-Test Split
-     ↓
-Feature Standardization
-     ↓
-Balanced Class Weights
-     ↓
-Model Training
-     ↓
-Model Evaluation
-""")
+    workflow = [
+        "Raw Wisconsin Breast Cancer Dataset",
+        "↓",
+        "Missing-value and duplicate check",
+        "↓",
+        "Stratified 80:20 train-test split",
+        "↓",
+        "Standardization for applicable models",
+        "↓",
+        "Balanced class weights",
+        "↓",
+        "Training-ready dataset"
+    ]
+
+    for step in workflow:
+        if step == "↓":
+            st.markdown(
+                "<div style='text-align:center; font-size:22px;'>↓</div>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                f"""
+                <div style="
+                    padding:10px;
+                    margin:4px;
+                    border:1px solid #cccccc;
+                    border-radius:8px;
+                    text-align:center;
+                ">
+                    <b>{step}</b>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    st.caption(
+        "These preprocessing steps were applied before evaluating the "
+        "classification models."
+    )
 
 # ============================================================
 # PREDICTION PAGE

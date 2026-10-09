@@ -920,68 +920,74 @@ elif page == "📊 Model Performance":
     # ROC CURVE COMPARISON
     # ========================================================
 
+    
     st.subheader("ROC Curve Comparison")
 
     # Prepare test data
     X_test_scaled = scaler.transform(X_TEST)
 
-    # Predicted probabilities
+    # Convert labels: malignant = 1, benign = 0 for ROC evaluation
+    y_test_malignant = (np.asarray(Y_TEST).ravel() == 0).astype(int)
+
+    # Predicted probabilities for the malignant class
     lr_prob = lr_model.predict_proba(
         X_test_scaled
-    )[:, 1]
+    )[:, 0]
 
     rf_prob = rf_model.predict_proba(
         X_TEST
-    )[:, 1]
+    )[:, 0]
 
     svm_prob = svm_model.predict_proba(
         X_test_scaled
-    )[:, 1]
+    )[:, 0]
 
-    nn_prob = nn_model.predict(
+    # Neural network output represents probability of benign (class 1)
+    # Convert it to probability of malignant (class 0)
+    nn_prob = 1 - nn_model.predict(
         X_test_scaled,
         verbose=0
     ).ravel()
 
-    # ROC curves
+    # ROC curves for malignant class
     lr_fpr, lr_tpr, _ = roc_curve(
-        Y_TEST,
+        y_test_malignant,
         lr_prob
     )
 
     rf_fpr, rf_tpr, _ = roc_curve(
-        Y_TEST,
+        y_test_malignant,
         rf_prob
     )
 
     svm_fpr, svm_tpr, _ = roc_curve(
-        Y_TEST,
+        y_test_malignant,
         svm_prob
     )
 
     nn_fpr, nn_tpr, _ = roc_curve(
-        Y_TEST,
+        y_test_malignant,
         nn_prob
     )
 
-    # AUC scores
+    # AUC scores for malignant class
     lr_auc = roc_auc_score(
-        Y_TEST,
+        y_test_malignant,
         lr_prob
     )
 
     rf_auc = roc_auc_score(
-        Y_TEST,
+        y_test_malignant,
         rf_prob
     )
 
     svm_auc = roc_auc_score(
-        Y_TEST,
+        y_test_malignant,
         svm_prob
     )
 
     nn_auc = roc_auc_score(
-        Y_TEST,
+        y_test_malignant,
         nn_prob
     )
 

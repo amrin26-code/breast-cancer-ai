@@ -527,6 +527,7 @@ elif page == "🔬 Prediction":
     # DEMONSTRATION SAMPLES
     # --------------------------------------------------------
 
+  
     from sklearn.datasets import load_breast_cancer
 
     demo_data = load_breast_cancer()
@@ -588,8 +589,11 @@ elif page == "🔬 Prediction":
 
         with col1 if i < 15 else col2:
 
+            # Initialize with a real dataset sample instead of zeros
             if f"feature_{i}" not in st.session_state:
-                st.session_state[f"feature_{i}"] = 0.0
+                st.session_state[f"feature_{i}"] = float(
+                    demo_data.data[0][i]
+                )
 
             value = st.number_input(
                 feature,

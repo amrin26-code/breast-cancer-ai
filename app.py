@@ -810,7 +810,7 @@ elif page == "📊 Model Performance":
             f1_score(Y_TEST, svm_pred, pos_label=0, zero_division=0),
             f1_score(Y_TEST, nn_pred, pos_label=0, zero_division=0)
         ]
-    })
+    )
 
     st.dataframe(
         metrics_df.style.format({
@@ -821,7 +821,6 @@ elif page == "📊 Model Performance":
         }),
         use_container_width=True,
         hide_index=True
-    )
     )
 
     st.subheader("Confusion Matrices")

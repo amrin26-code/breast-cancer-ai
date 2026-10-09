@@ -614,38 +614,33 @@ elif page == "🔬 Prediction":
     # PREDICTION
     # --------------------------------------------------------
 
+   
     if predict_button:
 
         X_input = np.array(input_values).reshape(1, -1)
 
-        # Scaled input for LR, SVM and Neural Network
+        # Scale input for models trained with standardized features
         X_input_scaled = scaler.transform(X_input)
 
         # Logistic Regression
-        lr_prediction = lr_model.predict(X_input_scaled)[0]
+        lr_prediction = int(lr_model.predict(X_input_scaled)[0])
         lr_probability = lr_model.predict_proba(X_input_scaled)[0]
 
         # Random Forest
-        rf_prediction = rf_model.predict(X_input)[0]
+        rf_prediction = int(rf_model.predict(X_input)[0])
         rf_probability = rf_model.predict_proba(X_input)[0]
 
         # SVM
-        svm_prediction = svm_model.predict(X_input_scaled)[0]
+        svm_prediction = int(svm_model.predict(X_input_scaled)[0])
         svm_probability = svm_model.predict_proba(X_input_scaled)[0]
 
-        # Neural Network
-        nn_probability = float(
-            nn_model.predict(
-                X_input_scaled,
-                verbose=0
-            )[0][0]
+        # Neural Network: sigmoid output represents probability of benign
+        nn_benign_probability = float(
+            nn_model.predict(X_input_scaled, verbose=0)[0][0]
         )
+        nn_prediction = 1 if nn_benign_probability >= 0.5 else 0
 
-        nn_prediction = 1 if nn_probability >= 0.5 else 0
-
-        # 0 = Malignant
-        # 1 = Benign
-
+        # Dataset encoding: 0 = Malignant, 1 = Benign
         predictions = [
             lr_prediction,
             rf_prediction,
@@ -660,65 +655,81 @@ elif page == "🔬 Prediction":
             "Neural Network"
         ]
 
-        # Probabilities
+        # Class probabilities (percentages)
         malignant_probabilities = [
-            (1 - lr_probability[1]) * 100,
-            (1 - rf_probability[1]) * 100,
-            (1 - svm_probability[1]) * 100,
-            (1 - nn_probability) * 100
+            float(lr_probability[0]) * 100,
+            float(rf_probability[0]) * 100,
+            float(svm_probability[0]) * 100,
+            (1 - nn_benign_probability) * 100
         ]
 
         benign_probabilities = [
-            lr_probability[1] * 100,
-            rf_probability[1] * 100,
-            svm_probability[1] * 100,
-            nn_probability * 100
+            float(lr_probability[1]) * 100,
+            float(rf_probability[1]) * 100,
+            float(svm_probability[1]) * 100,
+            nn_benign_probability * 100
         ]
 
-        # Consensus
+        # Majority-vote consensus
         malignant_votes = predictions.count(0)
         benign_votes = predictions.count(1)
 
         if malignant_votes > benign_votes:
             final_prediction = "MALIGNANT"
             consensus_votes = malignant_votes
-        else:
+        elif benign_votes > malignant_votes:
             final_prediction = "BENIGN"
             consensus_votes = benign_votes
+        else:
+            final_prediction = "TIED"
+            consensus_votes = 2
 
-        average_malignant_probability = (
-            sum(malignant_probabilities) / 4
+        # Average model outputs: descriptive only, not clinical risk
+        average_malignant_probability = sum(malignant_probabilities) / len(
+            malignant_probabilities
         )
-
-        average_benign_probability = (
-            sum(benign_probabilities) / 4
+        average_benign_probability = sum(benign_probabilities) / len(
+            benign_probabilities
         )
 
         st.subheader("Prediction Result")
 
         if final_prediction == "MALIGNANT":
-            st.error("⚠️ Model Consensus: MALIGNANT")
+            st.error("Model Consensus: MALIGNANT")
+        elif final_prediction == "BENIGN":
+            st.success("Model Consensus: BENIGN")
         else:
-            st.success("✅ Model Consensus: BENIGN")
+            st.warning("Model Consensus: TIED — 2 models each")
 
         st.write(
-            f"🧠 **Model Consensus:** "
-            f"{consensus_votes}/4 models agree"
+            f"**Agreement:** {consensus_votes}/4 models "
+            f"support the majority prediction."
+        )
+
+        st.caption(
+            "These are outputs from machine-learning models, not a "
+            "medical diagnosis or a validated estimate of an individual's "
+            "cancer risk."
         )
 
         col1, col2 = st.columns(2)
 
         with col1:
             st.metric(
-                "Average Malignant Probability",
+                "Mean Malignant-Class Probability",
                 f"{average_malignant_probability:.2f}%"
             )
 
         with col2:
             st.metric(
-                "Average Benign Probability",
+                "Mean Benign-Class Probability",
                 f"{average_benign_probability:.2f}%"
             )
+
+        st.caption(
+            "Mean probabilities are simple averages across four models. "
+            "They are shown for comparison and are not clinically calibrated."
+        )
 
         st.subheader("Individual Model Predictions")
 
@@ -729,12 +740,10 @@ elif page == "🔬 Prediction":
                 for p in predictions
             ],
             "Malignant Probability (%)": [
-                round(x, 2)
-                for x in malignant_probabilities
+                round(x, 2) for x in malignant_probabilities
             ],
             "Benign Probability (%)": [
-                round(x, 2)
-                for x in benign_probabilities
+                round(x, 2) for x in benign_probabilities
             ]
         })
 
@@ -745,8 +754,10 @@ elif page == "🔬 Prediction":
         )
 
         st.warning(
-            "This application is for educational and research purposes "
-            "only and must not be used as a medical diagnostic tool."
+            "Educational and research prototype only. This application "
+            "has not been validated for clinical use. Do not use its output "
+            "to make medical decisions. Consult a qualified healthcare "
+            "professional for medical assessment."
         )
 
 # ============================================================

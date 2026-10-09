@@ -792,35 +792,36 @@ elif page == "📊 Model Performance":
             accuracy_score(Y_TEST, svm_pred),
             accuracy_score(Y_TEST, nn_pred)
         ],
-        "Precision": [
-            precision_score(Y_TEST, lr_pred),
-            precision_score(Y_TEST, rf_pred),
-            precision_score(Y_TEST, svm_pred),
-            precision_score(Y_TEST, nn_pred)
+        "Precision (Malignant)": [
+            precision_score(Y_TEST, lr_pred, pos_label=0, zero_division=0),
+            precision_score(Y_TEST, rf_pred, pos_label=0, zero_division=0),
+            precision_score(Y_TEST, svm_pred, pos_label=0, zero_division=0),
+            precision_score(Y_TEST, nn_pred, pos_label=0, zero_division=0)
         ],
-        "Recall": [
-            recall_score(Y_TEST, lr_pred),
-            recall_score(Y_TEST, rf_pred),
-            recall_score(Y_TEST, svm_pred),
-            recall_score(Y_TEST, nn_pred)
+        "Recall (Malignant)": [
+            recall_score(Y_TEST, lr_pred, pos_label=0, zero_division=0),
+            recall_score(Y_TEST, rf_pred, pos_label=0, zero_division=0),
+            recall_score(Y_TEST, svm_pred, pos_label=0, zero_division=0),
+            recall_score(Y_TEST, nn_pred, pos_label=0, zero_division=0)
         ],
-        "F1-score": [
-            f1_score(Y_TEST, lr_pred),
-            f1_score(Y_TEST, rf_pred),
-            f1_score(Y_TEST, svm_pred),
-            f1_score(Y_TEST, nn_pred)
+        "F1-score (Malignant)": [
+            f1_score(Y_TEST, lr_pred, pos_label=0, zero_division=0),
+            f1_score(Y_TEST, rf_pred, pos_label=0, zero_division=0),
+            f1_score(Y_TEST, svm_pred, pos_label=0, zero_division=0),
+            f1_score(Y_TEST, nn_pred, pos_label=0, zero_division=0)
         ]
     })
 
     st.dataframe(
         metrics_df.style.format({
             "Accuracy": "{:.4f}",
-            "Precision": "{:.4f}",
-            "Recall": "{:.4f}",
-            "F1-score": "{:.4f}"
+            "Precision (Malignant)": "{:.4f}",
+            "Recall (Malignant)": "{:.4f}",
+            "F1-score (Malignant)": "{:.4f}"
         }),
         use_container_width=True,
         hide_index=True
+    )
     )
 
     st.subheader("Confusion Matrices")
